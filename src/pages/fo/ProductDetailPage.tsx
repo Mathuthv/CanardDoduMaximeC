@@ -211,13 +211,12 @@ export function ProductDetailPage() {
                   <input
                     type="number"
                     min={1}
-                    max={product.stockPhysiqueDisponible}
                     value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Math.min(product.stockPhysiqueDisponible, parseInt(e.target.value) || 1)))}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                     className="w-20 text-center rounded-lg border border-gray-300 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bordeaux-500"
                   />
                   <button
-                    onClick={() => setQuantity(Math.min(product.stockPhysiqueDisponible, quantity + 1))}
+                    onClick={() => setQuantity(quantity + 1)}
                     className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
