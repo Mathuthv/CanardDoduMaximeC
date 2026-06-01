@@ -32,6 +32,8 @@ export function DeliverySetupPage() {
 
   const [selectedAddressId, setSelectedAddressId] = useState(currentClient?.adressesLivraison[0]?.id || '')
   const [deliveryDate, setDeliveryDate] = useState(getMinDeliveryDate())
+  const [multiLivraison, setMultiLivraison] = useState(false)
+  const [extraLivraisons, setExtraLivraisons] = useState<{ id: number; addressId: string; date: string }[]>([])
 
   if (!currentClient) {
     return (
@@ -49,14 +51,30 @@ export function DeliverySetupPage() {
 
   const selectedAddress = currentClient.adressesLivraison.find(a => a.id === selectedAddressId)
 
+  const handleAddLivraison = () => {
+    setExtraLivraisons(prev => [...prev, {
+      id: Date.now(),
+      addressId: currentClient.adressesLivraison[1]?.id || currentClient.adressesLivraison[0]?.id || '',
+      date: getMinDeliveryDate(),
+    }])
+  }
+
+  const handleRemoveLivraison = (id: number) => {
+    setExtraLivraisons(prev => prev.filter(l => l.id !== id))
+  }
+
   const handleContinue = () => {
+    const lineDeliveries: Record<string, { addressId: string; date: string }> = {}
+    extraLivraisons.forEach((l, i) => {
+      lineDeliveries[`extra-${i}`] = { addressId: l.addressId, date: l.date }
+    })
     setDelivery({
       deliveryAddressId: selectedAddressId,
       deliveryDate,
       billingAddress: currentClient.adrFacturationCentralisee,
       buyerAddress: `${currentClient.raisonSociale}\n${currentClient.contactPrincipal}\n${currentClient.email}`,
-      multiLivraison: false,
-      lineDeliveries: {},
+      multiLivraison,
+      lineDeliveries,
     })
     navigate('/catalogue')
   }
@@ -103,9 +121,71 @@ export function DeliverySetupPage() {
           </div>
         )}
         {currentClient.adressesLivraison.length > 1 && (
-          <p className="text-xs text-gray-400 mt-2">
-            Vous pourrez fractionner la livraison par ligne au panier (DS-06).
-          </p>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={multiLivraison}
+                onChange={e => {
+                  setMultiLivraison(e.target.checked)
+                  if (!e.target.checked) setExtraLivraisons([])
+                }}
+                className="rounded border-gray-300 text-bordeaux-700 focus:ring-bordeaux-500"
+              />
+              <span className="font-medium text-gray-700">Livraisons fractionnees (DS-06)</span>
+            </label>
+            <p className="text-xs text-gray-400 mt-1">
+              Ajoutez des livraisons supplementaires avec des adresses et dates distinctes. L'adresse de facturation reste unique.
+            </p>
+
+            {multiLivraison && (
+              <div className="mt-3 space-y-3">
+                {/* Livraison principale */}
+                <div className="p-3 bg-bordeaux-50 rounded-lg text-sm">
+                  <p className="font-medium text-bordeaux-800 mb-1">Livraison principale</p>
+                  <p className="text-gray-600">{selectedAddress?.libelle} — {deliveryDate}</p>
+                </div>
+
+                {/* Livraisons supplémentaires */}
+                {extraLivraisons.map((livr, i) => {
+                  const addr = currentClient.adressesLivraison.find(a => a.id === livr.addressId)
+                  return (
+                    <div key={livr.id} className="p-3 bg-gray-50 rounded-lg space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-gray-700">Livraison supplementaire {i + 1}</p>
+                        <button
+                          onClick={() => handleRemoveLivraison(livr.id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                      <Select
+                        label="Adresse"
+                        options={addressOptions}
+                        value={livr.addressId}
+                        onChange={e => setExtraLivraisons(prev => prev.map(l => l.id === livr.id ? { ...l, addressId: e.target.value } : l))}
+                      />
+                      <Input
+                        type="date"
+                        label="Date de livraison"
+                        value={livr.date}
+                        min={getMinDeliveryDate()}
+                        onChange={e => setExtraLivraisons(prev => prev.map(l => l.id === livr.id ? { ...l, date: e.target.value } : l))}
+                      />
+                      {addr && (
+                        <p className="text-xs text-gray-500">{addr.rue}, {addr.codePostal} {addr.ville}</p>
+                      )}
+                    </div>
+                  )
+                })}
+
+                <Button variant="secondary" size="sm" onClick={handleAddLivraison}>
+                  + Ajouter une livraison
+                </Button>
+              </div>
+            )}
+          </div>
         )}
       </Card>
 

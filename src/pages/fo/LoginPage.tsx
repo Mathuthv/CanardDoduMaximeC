@@ -55,7 +55,19 @@ export function LoginPage() {
               </div>
 
               {error && !isLocked && (
-                <Alert variant="error">{error}</Alert>
+                <Alert variant="error">
+                  {error}
+                  <p className="mt-2 text-xs">
+                    Vous n'avez pas de compte ?{' '}
+                    <button
+                      type="button"
+                      className="underline font-medium text-bordeaux-700 hover:text-bordeaux-900"
+                      onClick={() => alert('Debranchement vers l\'activite externe « Creation client » (DS-03). Non decrite dans ce CU.')}
+                    >
+                      Demander la creation d'un compte
+                    </button>
+                  </p>
+                </Alert>
               )}
 
               {isLocked && (
