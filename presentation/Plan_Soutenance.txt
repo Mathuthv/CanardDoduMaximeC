@@ -1,0 +1,174 @@
+I. Contexte et Diagnostic (Ce que nous avons compris) ~ 4 minutes
+
+L'objectif est de montrer que vous avez cerné les enjeux business et les points de douleur actuels sans vous attarder sur les détails inutiles.
+
+    Enjeux stratégiques : Ambition de doubler le chiffre d'affaires (passer à 100 M€) et expansion géographique (agences nationales et internationales).  
+
+    Les dysfonctionnements critiques (Le "bricolage" actuel) :
+
+        Bases de données Access fragmentées et utilisation archaïque du fax.  
+
+        Le point noir : La facturation anticipée, décorrélée de la réalité des stocks expédiés, qui paralyse la comptabilité avec la gestion de 100 à 200 avoirs par mois.  
+
+        Absence cruelle d'outils décisionnels pour anticiper la production saisonnière et calculer les primes.  
+
+II. Hypothèses, Principes et Négociations ~ 5 minutes
+
+C'est ici qu'on montre votre valeur ajoutée métier et vos prises de position face au client.
+
+    Périmètre et Hypothèses retenues : Focus exclusif sur le circuit de gestion commerciale. La comptabilité générale (encaissements) et la production interne des cuisines sont volontairement laissées hors périmètre car elles fonctionnent déjà avec des outils fiables.  
+
+    Principes directeurs du nouveau SI :
+
+        Centralisation absolue : Abandon de l'architecture locale (réseau NT) pour du Cloud N-Tiers.  
+
+        Autonomie (Self-service) : Responsabilisation du client B2B via un portail e-commerce.  
+
+    Ce qui a été négocié (Le processus des Avoirs) :
+
+        Refonte totale du paradigme de la facturation : la facture ne partira jamais avant que la logistique n'ait validé ce qui est réellement mis dans le camion.  
+
+        Fini les "avoirs orphelins" : tout litige devra obligatoirement être rattaché à une facture d'origine acquittée, ce qui force la rigueur de l'entrepôt (Matthieu Fléchard).  
+
+III. La Solution Proposée (Comment remédier) ~ 6 minutes
+
+Explication de l'architecture et des grands blocs fonctionnels qui vont soutenir la croissance de l'entreprise.
+
+    Le Cœur Transactionnel (ERP / Portail Web) :
+
+        Mise en place d'un portail B2B permettant la visibilité des stocks en temps réel.  
+
+        Gestion automatisée et centralisée de la complexité commerciale (multi-TVA, adresses de facturation centralisées, remises croisées).  
+
+    L'Intelligence Décisionnelle (Datawarehouse) :
+
+        Création d'un flux ETL nocturne pour ne pas ralentir le site e-commerce.  
+
+        Développement de tableaux de bord pour Françoise (calcul automatisé des primes et anticipation de la production des fêtes).  
+
+IV. Démonstration (Démo) ~ 10 minutes
+
+Le cœur de la soutenance. On montre le parcours complet de création d'une commande (UC_03, maquettes F-01 à F-07 du SFD), PUIS on enchaîne sur la preuve concrète des 3 verrous métier en basculant côté Back-Office (Logistique, Facturation, SAV). C'est ce chaînage complet qui prouve que le problème des 200 avoirs/mois est résolu. La maquette interactive remplace les wireframes Balsamiq.
+
+    Comptes de démo :
+        Front-Office : client@latabledoor.fr / demo2026 (La Table d'Or, chaîne, remise 15%)
+        Back-Office : basculement via la barre de démo en haut (Matthieu, Hélène)
+
+    ──────────────────────────────────────────────────────
+    PARTIE A — Parcours Client : Passer une commande (6 min)
+    ──────────────────────────────────────────────────────
+
+    Intro (30 sec) :
+        "Je vais vous montrer le chemin critique de notre solution : de la commande client jusqu'à la facturation. Ce parcours met en action les 3 verrous métier que nous avons conçus pour éradiquer les 200 avoirs par mois : le Verrou de Stock, le Verrou Logistique et le Verrou Comptable. Plutôt que des wireframes Balsamiq, nous avons réalisé une maquette interactive pour rendre cette démonstration plus vivante."
+
+    Étape 1 — Connexion et préparation (1 min) :
+        Écrans : F-01 (Login) + F-02 (Adresses et date)
+        Se connecter avec client@latabledoor.fr / demo2026.
+        Arriver sur F-02 (conformément au SFD : adresses AVANT le catalogue).
+        Montrer les 3 adresses indépendantes (DS-04) :
+            (1) Adresse acheteur : pré-remplie depuis le profil, lecture seule
+            (2) Adresse de livraison : sélection dans la liste (Paris 8e / Lyon 2e / Bordeaux)
+            (3) Adresse de facturation : centralisée au siège, unique même en multi-livraisons
+        Saisir la date de livraison souhaitée (DS-05) : contrôle date > J+2, jours ouvrés.
+        → Valider et accéder au catalogue.
+
+    Étape 2 — Catalogue et prix personnalisés (1 min) :
+        Écrans : F-03 (Catalogue) + F-04 (Fiche produit)
+        Montrer que les prix sont DÉJÀ remisés pour La Table d'Or : prix barré + prix remisé -15% fidélité (DS-09, DS-10).
+        Montrer les badges stock : vert / orange / rouge.
+        Ajouter « Foie Gras de Canard Entier » (FG-001, TVA 5,5%) → micro-état « Vérification du stock... ».
+        Ajouter « Sauternes AOC 2019 » (VN-001, TVA 20%) pour la démo multi-TVA.
+
+    Étape 3 — VERROU DE STOCK en action (1 min) :
+        Écrans : F-04 + F-04a
+        Aller sur « Foie Gras Mi-Cuit au Poivre de Sichuan » (FG-003, stock = 0).
+        → Bannière dorée « Verrou de Stock », bouton grisé, ajout IMPOSSIBLE.
+        → Le système propose automatiquement des produits de substitution de la même famille (3 foies gras en stock).
+        Tester aussi la limite de quantité sur FG-002 (stock = 80) : saisir 90 → blocage « Quantité maximale : 80 ».
+        "C'est notre premier verrou : aucune commande ne peut contenir un produit indisponible."
+
+    Étape 4 — Panier et moteur de calcul (1 min) :
+        Écran : F-05 (Panier)
+        Montrer : remises automatiques (-15%), ventilation TVA (5,5% + 20% sur deux lignes distinctes).
+        Montrer le message « Plus que X € pour la livraison offerte ! » (ou « Franco de port » si seuil atteint).
+        Modifier une quantité → recalcul temps réel de tous les totaux.
+
+    Étape 5 — Récapitulatif et Paiement (1 min) :
+        Écran : F-06 (Récapitulatif + paiement)
+        Récapitulatif complet : rappel des 3 adresses, date, lignes, TVA ventilée, total TTC.
+        « Procéder au paiement » → micro-état « Vérification du stock en temps réel... » (re-vérif A4).
+        DEMO ÉCHEC PAIEMENT : cocher « Simuler un échec (A8) » → message erreur, commande annulée, stock libéré, retour panier.
+        Décocher → paiement réussi.
+
+    Étape 6 — Confirmation (30 sec) :
+        Écran : F-07 (Confirmation)
+        Numéro de commande attribué, statut EN_PREPARATION.
+        Date de livraison affichée.
+        Animation email : « Envoi... » → « Email envoyé à commandes@latabledoor.fr ».
+        "La commande est transmise à la logistique. Passons maintenant du côté de Matthieu Fléchard."
+
+    ──────────────────────────────────────────────────────
+    PARTIE B — Back-Office : Les 2 autres verrous en action (3 min 30)
+    ──────────────────────────────────────────────────────
+
+    Transition (10 sec) :
+        Basculer vers Matthieu Fléchard via la barre de démo en haut.
+        "On est maintenant dans le Back-Office, côté entrepôt de Saint-Quentin-en-Yvelines."
+
+    Étape 7 — VERROU LOGISTIQUE : Matthieu prépare l'expédition (1 min 30) :
+        Écran : /back-office/logistique
+        Montrer la commande qu'on vient de créer dans la liste « Commandes à expédier » (statut PAYEE_VALIDEE ou EN_PREPARATION).
+        Cliquer dessus : saisir les quantités RÉELLEMENT expédiées.
+        Mettre un écart volontaire sur une ligne (commandé 5, expédié 4) → affichage « -1 Reliquat ».
+        Valider l'expédition → statut passe à EXPEDIEE.
+        "Matthieu a validé ce qui est RÉELLEMENT parti dans le camion. C'est cette donnée qui débloque la suite."
+
+        Basculer vers Hélène Mirabelle via la barre de démo.
+        "Passons au service facturation d'Hélène."
+
+    Étape 8 — VERROU LOGISTIQUE (preuve) : Hélène ne peut facturer que l'expédié (1 min) :
+        Écran : /back-office/facturation → onglet « À facturer »
+        Sélectionner une commande NON expédiée (ex : CMD-2026-004 en PAYEE_VALIDEE).
+        → Bannière dorée « Verrou Logistique : Impossible de facturer — commande non expédiée. Les quantités réellement expédiées doivent être validées par la logistique. »
+        → Bouton « Émettre la facture » GRISÉ.
+        "C'est ÇA qui résout le problème de la facturation anticipée. Avant, Hélène facturait à l'aveugle. Maintenant, le système l'en empêche."
+
+        Maintenant sélectionner la commande qu'on vient d'expédier (EXPEDIEE).
+        → Aperçu facture basé sur les quantités EXPÉDIÉES (pas commandées). La ligne avec l'écart montre 4, pas 5.
+        → Émettre la facture. "La facture correspond exactement à ce qui est parti dans le camion. Zéro avoir nécessaire."
+
+    Étape 9 — VERROU COMPTABLE : l'avoir rattaché obligatoirement (1 min) :
+        Écran : /back-office/avoirs → onglet « Créer un avoir »
+        SANS sélectionner de facture : montrer la bannière dorée « Verrou Comptable : Un avoir doit obligatoirement être rattaché à une facture existante ».
+        "C'est notre troisième verrou. Fini les avoirs orphelins qui polluaient la comptabilité."
+        Sélectionner une facture → montrer qu'on peut alors sélectionner les lignes à créditer, saisir un motif, et générer l'avoir proprement.
+
+    ──────────────────────────────────────────────────────
+    CONCLUSION DÉMO (30 sec)
+    ──────────────────────────────────────────────────────
+
+        "Vous avez vu les 3 verrous en action :
+            1. Le Verrou de Stock empêche de commander ce qui n'existe pas.
+            2. Le Verrou Logistique empêche de facturer ce qui n'est pas parti.
+            3. Le Verrou Comptable empêche de créer des avoirs sans traçabilité.
+        C'est ce chaînage complet — de la commande client jusqu'à l'avoir — qui éradique les 200 avoirs par mois et libère deux personnes à temps plein chez Hélène."
+
+V. Mise en œuvre : Planning, Budget et Accompagnement ~ 5 minutes
+
+Prouver que le projet est réaliste, maîtrisé et que les utilisateurs ne seront pas abandonnés.
+
+    Budget (CAPEX / OPEX) : Présentation du coût global de 136 750 € HT pour la conception, le matériel, la formation et la maintenance de la première année. (Préciser que ce ROI est très rapide face aux 50 M€ de CA).  
+
+    Planning : Un déploiement stratégique sur 9 mois découpé en 5 grandes phases, avec le E-commerce en priorité absolue.  
+
+    Conduite du changement :
+
+        Insister sur le fait que la réussite technique dépend de l'humain.
+
+        Mentionner le plan d'action spécifique pour le service livraison à Saint-Quentin-en-Yvelines (Matthieu Fléchard) : engagement formel de la Direction pour forcer l'usage des terminaux durcis.  
+
+VI. Conclusion & Questions / Réponses ~ 2 minutes
+
+    Bilan : Le Canard Dodu passe d'une gestion artisanale subie à un pilotage numérique assumé, prêt pour conquérir l'international.
+
+    Ouverture aux questions de l'auditoire.
