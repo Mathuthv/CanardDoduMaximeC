@@ -1,8 +1,5 @@
 import { LigneCommande, Produit, TVA, Remise, Commercial, Commande, CodeTVA, TVABreakdownLine, CartTotals, PrimeCommercial, LignePanier, StatutCommande } from '../types'
 
-const FRANCO_SEUIL = 500 // Free shipping above 500€ HT
-const FRAIS_PORT = 25 // Flat shipping fee
-
 export function calcLineTotalHT(quantite: number, prixUnitaireHT: number, remise: number): number {
   return Math.round(quantite * prixUnitaireHT * (1 - remise) * 100) / 100
 }
@@ -34,11 +31,11 @@ export function calcTVABreakdown(
   }))
 }
 
-export function calcFrancoDePort(totalHT: number): { fraisPort: number; francoDePort: boolean } {
-  if (totalHT >= FRANCO_SEUIL) {
+export function calcFrancoDePort(totalHT: number, francoSeuil = 500, fraisPort = 25): { fraisPort: number; francoDePort: boolean } {
+  if (totalHT >= francoSeuil) {
     return { fraisPort: 0, francoDePort: true }
   }
-  return { fraisPort: FRAIS_PORT, francoDePort: false }
+  return { fraisPort: fraisPort, francoDePort: false }
 }
 
 export function findApplicableRemises(
@@ -71,7 +68,9 @@ export function calcCartTotals(
   products: Produit[],
   tvaRates: TVA[],
   idClient: string,
-  remises: Remise[]
+  remises: Remise[],
+  francoSeuil = 500,
+  fraisPortMontant = 25
 ): CartTotals {
   let totalHT = 0
   let totalRemises = 0
@@ -102,7 +101,7 @@ export function calcCartTotals(
   const tvaBreakdown = calcTVABreakdown(linesWithPrices, products, tvaRates)
   const totalTVA = Math.round(tvaBreakdown.reduce((sum, t) => sum + t.montantTVA, 0) * 100) / 100
 
-  const { fraisPort, francoDePort } = calcFrancoDePort(finalHTApresRemises)
+  const { fraisPort, francoDePort } = calcFrancoDePort(finalHTApresRemises, francoSeuil, fraisPortMontant)
 
   return {
     totalHT: Math.round(totalHT * 100) / 100,

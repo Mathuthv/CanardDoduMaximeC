@@ -32,7 +32,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     }
 
     const products = useProductStore.getState().products
-    const { tvaRates } = useConfigStore.getState()
+    const { tvaRates, francoSeuil, fraisPort: fraisPortConfig } = useConfigStore.getState()
     const client = initialClients.find(c => c.idClient === commande.idClient)
 
     const lignes: LigneFacture[] = commande.lignes.map(l => {
@@ -59,7 +59,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       tvaRates
     )
     const totalTVA = Math.round(tvaBreakdown.reduce((s, t) => s + t.montantTVA, 0) * 100) / 100
-    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT)
+    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT, francoSeuil, fraisPortConfig)
 
     const numFacture = `FAC-2026-${String(get().factures.length + 1).padStart(3, '0')}`
 

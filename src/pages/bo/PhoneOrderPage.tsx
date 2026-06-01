@@ -28,7 +28,7 @@ interface OrderLine {
 export function PhoneOrderPage() {
   const { products, search, updateStock, getByRef } = useProductStore()
   const { createFromPhone } = useOrderStore()
-  const { tvaRates, remises } = useConfigStore()
+  const { tvaRates, remises, francoSeuil, fraisPort: fraisPortConfig } = useConfigStore()
 
   const [selectedClientId, setSelectedClientId] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -138,7 +138,7 @@ export function PhoneOrderPage() {
     }))
     const tvaBreakdown = calcTVABreakdown(lines, products, tvaRates)
     const totalTVA = tvaBreakdown.reduce((s, t) => s + t.montantTVA, 0)
-    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT)
+    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT, francoSeuil, fraisPortConfig)
     const totalTTC = Math.round((totalHT + totalTVA + fraisPort) * 100) / 100
 
     return { totalHT, totalHTBrut, totalRemises, tvaBreakdown, totalTVA, fraisPort, francoDePort, totalTTC }

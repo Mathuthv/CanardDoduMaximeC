@@ -24,7 +24,7 @@ export function InvoicingPage() {
   const { commandes } = useOrderStore()
   const { factures, generateInvoice } = useInvoiceStore()
   const { products } = useProductStore()
-  const { tvaRates } = useConfigStore()
+  const { tvaRates, francoSeuil, fraisPort: fraisPortConfig } = useConfigStore()
 
   const [selectedOrderNum, setSelectedOrderNum] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState('')
@@ -75,7 +75,7 @@ export function InvoicingPage() {
       tvaRates
     )
     const totalTVA = tvaBreakdown.reduce((s, t) => s + t.montantTVA, 0)
-    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT)
+    const { fraisPort, francoDePort } = calcFrancoDePort(totalHT, francoSeuil, fraisPortConfig)
     const totalTTC = Math.round((totalHT + totalTVA + fraisPort) * 100) / 100
 
     return { lines, totalHT, tvaBreakdown, totalTVA, fraisPort, francoDePort, totalTTC }

@@ -47,7 +47,7 @@ export function RoleSwitcher() {
         <span className="text-gold-400 font-medium">MODE DEMO</span>
       </div>
       <div className="flex items-center gap-1 flex-wrap">
-        {initialComptes.filter(c => c.role !== Role.CLIENT || c.login === 'client@latabledoor.fr').map(compte => (
+        {initialComptes.map(compte => (
           <button
             key={compte.login}
             onClick={() => handleSwitch(compte.login)}

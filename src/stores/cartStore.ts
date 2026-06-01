@@ -71,9 +71,9 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   getCartTotals: (idClient) => {
     const { products } = useProductStore.getState()
-    const { tvaRates, remises } = useConfigStore.getState()
+    const { tvaRates, remises, francoSeuil, fraisPort } = useConfigStore.getState()
     const lignes = get().lignes.map(l => ({ reference: l.reference, quantite: l.quantiteSouhaitee }))
-    return calcCartTotals(lignes, products, tvaRates, idClient, remises)
+    return calcCartTotals(lignes, products, tvaRates, idClient, remises, francoSeuil, fraisPort)
   },
 
   getLineCount: () => get().lignes.reduce((sum, l) => sum + l.quantiteSouhaitee, 0),
