@@ -8,7 +8,9 @@ interface OrderState {
   getByNum: (num: string) => Commande | undefined
   getByClient: (idClient: string) => Commande[]
   getByStatut: (statut: StatutCommande) => Commande[]
-  createFromCart: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[]) => Commande
+  createFromCart: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[], dateLivraisonSouhaitee?: string) => Commande
+  setEnAttentePaiement: (numCommande: string) => void
+  revertToCart: (numCommande: string) => void
   createFromPhone: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[], notes?: string) => Commande
   advanceStatus: (numCommande: string, newStatus: StatutCommande) => void
   setExpediedQty: (numCommande: string, ligneId: string, qtyExpediee: number) => void
@@ -24,7 +26,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
   getByStatut: (statut) => get().commandes.filter(c => c.statut === statut),
 
-  createFromCart: (idClient, login, idCommercial, adresseLivraisonId, lignes) => {
+  createFromCart: (idClient, login, idCommercial, adresseLivraisonId, lignes, dateLivraisonSouhaitee) => {
     const numCommande = `CMD-2026-${String(get().commandes.length + 1).padStart(3, '0')}`
     const commande: Commande = {
       numCommande,
@@ -32,13 +34,28 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       login,
       idCommercial,
       dateValidationWeb: new Date().toISOString().split('T')[0],
-      statut: StatutCommande.PAYEE_VALIDEE,
+      statut: StatutCommande.EN_ATTENTE_PAIEMENT,
       devise: Devise.EUR,
       lignes,
       adresseLivraisonId,
+      dateLivraisonSouhaitee,
     }
     set(state => ({ commandes: [...state.commandes, commande] }))
     return commande
+  },
+
+  setEnAttentePaiement: (numCommande) => {
+    set(state => ({
+      commandes: state.commandes.map(c =>
+        c.numCommande === numCommande ? { ...c, statut: StatutCommande.EN_ATTENTE_PAIEMENT } : c
+      ),
+    }))
+  },
+
+  revertToCart: (numCommande) => {
+    set(state => ({
+      commandes: state.commandes.filter(c => c.numCommande !== numCommande),
+    }))
   },
 
   createFromPhone: (idClient, login, idCommercial, adresseLivraisonId, lignes, notes) => {

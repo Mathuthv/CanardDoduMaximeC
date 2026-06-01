@@ -2,12 +2,15 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProductStore } from '../../stores/productStore'
 import { useCartStore } from '../../stores/cartStore'
+import { useAuthStore } from '../../stores/authStore'
+import { useConfigStore } from '../../stores/configStore'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import { Alert } from '../../components/ui/Alert'
 import { ProductCard } from '../../components/shared/ProductCard'
 import { CategorieProduit } from '../../types'
 import { formatCategorie } from '../../utils/formatters'
+import { findApplicableRemises, getBestRemise } from '../../utils/calculations'
 import { Search, SlidersHorizontal } from 'lucide-react'
 
 type SortOption = 'name' | 'price_asc' | 'price_desc'
@@ -16,6 +19,14 @@ export function CatalogPage() {
   const navigate = useNavigate()
   const { products } = useProductStore()
   const { addLine } = useCartStore()
+  const { currentClient } = useAuthStore()
+  const { remises } = useConfigStore()
+  const clientId = currentClient?.idClient || ''
+
+  const getRemiseTaux = (ref: string) => {
+    const applicable = findApplicableRemises(clientId, 0, ref, remises)
+    return getBestRemise(applicable)
+  }
 
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Set<CategorieProduit>>(new Set())
@@ -187,6 +198,7 @@ export function CatalogPage() {
               product={product}
               onAddToCart={handleAddToCart}
               onClick={(ref) => navigate(`/catalogue/${ref}`)}
+              remiseTaux={getRemiseTaux(product.reference)}
             />
           ))}
         </div>

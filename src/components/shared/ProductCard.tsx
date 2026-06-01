@@ -10,10 +10,13 @@ interface ProductCardProps {
   product: Produit
   onAddToCart?: (ref: string) => void
   onClick?: (ref: string) => void
+  remiseTaux?: number  // 0.15 = 15%
 }
 
-export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, onClick, remiseTaux }: ProductCardProps) {
   const isOutOfStock = product.stockPhysiqueDisponible <= 0
+  const hasRemise = remiseTaux !== undefined && remiseTaux > 0
+  const prixRemise = hasRemise ? Math.round(product.prixUnitaireHT * (1 - remiseTaux) * 100) / 100 : product.prixUnitaireHT
 
   return (
     <Card hover padding="none" className="overflow-hidden flex flex-col" >
@@ -34,7 +37,15 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           <h3 className="font-serif font-semibold text-gray-900 mb-1 line-clamp-2">{product.libelle}</h3>
           <p className="text-sm text-gray-500 line-clamp-2 mb-3">{product.description}</p>
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-bordeaux-800">{formatCurrency(product.prixUnitaireHT)}<span className="text-xs font-normal text-gray-500"> HT/{product.unite}</span></span>
+            {hasRemise ? (
+              <div>
+                <span className="text-lg font-bold text-bordeaux-800">{formatCurrency(prixRemise)}<span className="text-xs font-normal text-gray-500"> HT/{product.unite}</span></span>
+                <span className="text-xs text-gray-400 line-through ml-2">{formatCurrency(product.prixUnitaireHT)}</span>
+                <span className="text-xs text-forest-700 ml-1">-{(remiseTaux * 100).toFixed(0)}%</span>
+              </div>
+            ) : (
+              <span className="text-lg font-bold text-bordeaux-800">{formatCurrency(product.prixUnitaireHT)}<span className="text-xs font-normal text-gray-500"> HT/{product.unite}</span></span>
+            )}
           </div>
         </div>
       </div>

@@ -1,29 +1,39 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useOrderStore } from '../../stores/orderStore'
 import { useProductStore } from '../../stores/productStore'
+import { useAuthStore } from '../../stores/authStore'
+import { initialClients } from '../../data/clients'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Alert } from '../../components/ui/Alert'
 import { OrderStatusBadge } from '../../components/shared/StatusBadge'
 import { formatCurrency, formatDate } from '../../utils/formatters'
 import { calcLineTotalHT } from '../../utils/calculations'
-import { CheckCircle, Package, BookOpen, Truck } from 'lucide-react'
+import { CheckCircle, Package, BookOpen, Truck, Mail, Calendar } from 'lucide-react'
 
 export function OrderConfirmationPage() {
   const { num } = useParams<{ num: string }>()
   const { getByNum } = useOrderStore()
   const { getByRef } = useProductStore()
+  const { currentClient } = useAuthStore()
 
   const commande = useMemo(() => getByNum(num || ''), [num, getByNum])
+
+  // Mock email notification
+  const [emailSent, setEmailSent] = useState(false)
+  useEffect(() => {
+    if (commande && !emailSent) {
+      const timer = setTimeout(() => setEmailSent(true), 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [commande, emailSent])
 
   if (!commande) {
     return (
       <div className="text-center py-20 space-y-4">
         <p className="text-gray-500 text-lg">Commande introuvable</p>
-        <Link to="/catalogue">
-          <Button>Retour au catalogue</Button>
-        </Link>
+        <Link to="/catalogue"><Button>Retour au catalogue</Button></Link>
       </div>
     )
   }
@@ -31,6 +41,8 @@ export function OrderConfirmationPage() {
   const orderTotal = commande.lignes.reduce((sum, l) => {
     return sum + calcLineTotalHT(l.quantiteCommandee, l.prixUnitaireHT, l.remiseAppliquee)
   }, 0)
+
+  const deliveryAddress = currentClient?.adressesLivraison.find(a => a.id === commande.adresseLivraisonId)
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 py-8">
@@ -46,6 +58,21 @@ export function OrderConfirmationPage() {
       <Alert variant="success" title="Paiement accepte">
         Votre commande a ete validee et payee avec succes.
       </Alert>
+
+      {/* Email notification mock */}
+      {emailSent ? (
+        <Alert variant="info" title="Confirmation envoyee">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4" />
+            <span>Un email de confirmation a ete envoye a <strong>{currentClient?.email || 'votre adresse'}</strong> avec le detail de la commande.</span>
+          </div>
+        </Alert>
+      ) : (
+        <div className="flex items-center gap-2 text-sm text-gray-400 justify-center">
+          <Mail className="w-4 h-4 animate-pulse" />
+          <span>Envoi de l'email de confirmation...</span>
+        </div>
+      )}
 
       {/* Order details card */}
       <Card padding="lg" className="space-y-6">
@@ -63,13 +90,27 @@ export function OrderConfirmationPage() {
             <p className="font-medium">{formatDate(commande.dateValidationWeb)}</p>
           </div>
           <div>
-            <p className="text-gray-500">Livraison estimee</p>
+            <p className="text-gray-500">Livraison souhaitee</p>
             <div className="flex items-center gap-1.5">
-              <Truck className="w-4 h-4 text-bordeaux-700" />
-              <p className="font-medium">3-5 jours ouvres</p>
+              <Calendar className="w-4 h-4 text-bordeaux-700" />
+              <p className="font-medium">
+                {commande.dateLivraisonSouhaitee
+                  ? formatDate(commande.dateLivraisonSouhaitee)
+                  : '3-5 jours ouvres'}
+              </p>
             </div>
           </div>
         </div>
+
+        {deliveryAddress && (
+          <div className="text-sm p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Truck className="w-4 h-4 text-bordeaux-700" />
+              <span className="font-medium">Adresse de livraison</span>
+            </div>
+            <p className="text-gray-600">{deliveryAddress.libelle} — {deliveryAddress.rue}, {deliveryAddress.codePostal} {deliveryAddress.ville}</p>
+          </div>
+        )}
 
         {/* Line items */}
         <div className="border-t border-gray-100 pt-4">
@@ -81,6 +122,9 @@ export function OrderConfirmationPage() {
                 <div key={l.idLigne} className="flex justify-between text-sm">
                   <span className="text-gray-600">
                     {product?.libelle || l.reference} x{l.quantiteCommandee}
+                    {l.remiseAppliquee > 0 && (
+                      <span className="text-forest-700 ml-1">(-{(l.remiseAppliquee * 100).toFixed(0)}%)</span>
+                    )}
                   </span>
                   <span className="font-medium">
                     {formatCurrency(calcLineTotalHT(l.quantiteCommandee, l.prixUnitaireHT, l.remiseAppliquee))}
@@ -96,18 +140,27 @@ export function OrderConfirmationPage() {
         </div>
       </Card>
 
+      {/* Next steps */}
+      <Card padding="md" className="bg-ivory-50">
+        <h3 className="text-sm font-semibold text-gray-700 mb-2">Prochaines etapes</h3>
+        <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+          <li>Votre commande est transmise a notre equipe logistique</li>
+          <li>Preparation et expedition sous 24-48h</li>
+          <li>Livraison a l'adresse indiquee a la date souhaitee</li>
+          <li>Facturation apres confirmation de l'expedition</li>
+        </ol>
+      </Card>
+
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link to="/commandes">
           <Button variant="primary" size="lg">
-            <Package className="w-4 h-4 mr-2" />
-            Voir mes commandes
+            <Package className="w-4 h-4 mr-2" /> Voir mes commandes
           </Button>
         </Link>
         <Link to="/catalogue">
           <Button variant="secondary" size="lg">
-            <BookOpen className="w-4 h-4 mr-2" />
-            Retour au catalogue
+            <BookOpen className="w-4 h-4 mr-2" /> Retour au catalogue
           </Button>
         </Link>
       </div>

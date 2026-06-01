@@ -166,3 +166,28 @@ export function canCreateAvoir(numFacture: string | undefined | null): { allowed
   }
   return { allowed: true }
 }
+
+export function verifyCartStock(
+  lignes: { reference: string; quantiteSouhaitee: number }[],
+  products: Produit[]
+): { valid: boolean; errors: { reference: string; libelle: string; demande: number; disponible: number }[] } {
+  const errors: { reference: string; libelle: string; demande: number; disponible: number }[] = []
+  for (const l of lignes) {
+    const product = products.find(p => p.reference === l.reference)
+    if (!product) continue
+    if (l.quantiteSouhaitee > product.stockPhysiqueDisponible) {
+      errors.push({
+        reference: l.reference,
+        libelle: product.libelle,
+        demande: l.quantiteSouhaitee,
+        disponible: product.stockPhysiqueDisponible,
+      })
+    }
+  }
+  return { valid: errors.length === 0, errors }
+}
+
+export function calcFrancoManquant(totalHT: number, francoSeuil: number): number {
+  if (totalHT >= francoSeuil) return 0
+  return Math.round((francoSeuil - totalHT) * 100) / 100
+}

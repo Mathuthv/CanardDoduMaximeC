@@ -7,13 +7,24 @@ import { useConfigStore } from '../../stores/configStore'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
+import { Alert } from '../../components/ui/Alert'
 import { VerrouBanner } from '../../components/shared/VerrouBanner'
 import { TVABreakdown } from '../../components/shared/TVABreakdown'
 import { RemiseBadge } from '../../components/shared/RemiseBadge'
 import { formatCurrency } from '../../utils/formatters'
-import { findApplicableRemises, getBestRemise, calcLineTotalHT } from '../../utils/calculations'
-import { ShoppingBag, Trash2, Minus, Plus, ArrowLeft, ArrowRight } from 'lucide-react'
+import { findApplicableRemises, getBestRemise, calcLineTotalHT, calcFrancoManquant } from '../../utils/calculations'
+import { ShoppingBag, Trash2, Minus, Plus, ArrowLeft, ArrowRight, Truck } from 'lucide-react'
 
+/**
+ * IHM — Panier (CU « Création d'une commande » — étape panier)
+ *
+ * Zone lignes       : type liste éditable, colonnes = produit, qté (saisie numérique ≥1 ≤stock), prix HT, remise, total ligne
+ * Zone quantité     : type saisie numérique, contrôle bloquant ≤ stock avec VerrouBanner si dépassement
+ * Zone récapitulatif: type affichage calculé (total HT brut, remises, HT après remises, ventilation TVA 5.5%/20%, frais port, TTC)
+ * Zone franco       : type affichage conditionnel, message « plus que X € » si seuil non atteint
+ * Zone actions      : type bouton, « Valider ma commande » → navigation CheckoutPage
+ * Référentiels      : produits (productStore), remises (configStore), adresses (client.adressesLivraison)
+ */
 export function CartPage() {
   const navigate = useNavigate()
   const { lignes, updateQty, removeLine, getCartTotals } = useCartStore()
@@ -22,8 +33,10 @@ export function CartPage() {
   const { remises } = useConfigStore()
   const [lineErrors, setLineErrors] = useState<Record<string, string>>({})
 
+  const { francoSeuil } = useConfigStore()
   const clientId = currentClient?.idClient || ''
   const totals = useMemo(() => getCartTotals(clientId), [lignes, clientId, getCartTotals])
+  const francoManquant = useMemo(() => calcFrancoManquant(totals.totalHTApresRemises, francoSeuil), [totals.totalHTApresRemises, francoSeuil])
 
   const handleUpdateQty = (ref: string, newQty: number) => {
     if (newQty <= 0) {
@@ -200,6 +213,12 @@ export function CartPage() {
                   <span>{formatCurrency(totals.fraisPort)}</span>
                 )}
               </div>
+              {!totals.francoDePort && francoManquant > 0 && (
+                <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg text-xs text-amber-800">
+                  <Truck className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Plus que <strong>{formatCurrency(francoManquant)}</strong> HT pour la livraison offerte !</span>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-gray-200">

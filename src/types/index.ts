@@ -152,8 +152,10 @@ export interface Commande {
   lignes: LigneCommande[]
   adresseLivraisonId: string
   notes?: string
+  dateLivraisonSouhaitee?: string  // ISO date, chosen by client at checkout
   dateExpedition?: string     // ISO date, set when EXPEDIEE
   dateFacturation?: string    // ISO date, set when FACTUREE
+  emailNotificationSent?: boolean  // mock: confirmation email sent
 }
 
 export interface LigneFacture {
