@@ -27,7 +27,7 @@ export function LoginPage() {
       setLoading(false)
 
       if (result.success) {
-        navigate('/dashboard')
+        navigate('/commande/preparation')
       } else {
         setError(result.message || 'Identifiants incorrects')
       }

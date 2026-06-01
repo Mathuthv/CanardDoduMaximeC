@@ -11,6 +11,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.FACTUREE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-001',
+    adresseFacturation: 'La Table d\'Or — Siège\n24 rue du Faubourg Saint-Honoré\n75008 Paris\nFrance',
+    francoDePort: true,
+    fraisDePortHT: 0,
     dateExpedition: '2026-03-12',
     dateFacturation: '2026-03-13',
     lignes: [
@@ -28,6 +31,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.FACTUREE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-002',
+    adresseFacturation: 'La Table d\'Or — Siège\n24 rue du Faubourg Saint-Honoré\n75008 Paris\nFrance',
+    francoDePort: true,
+    fraisDePortHT: 0,
     dateExpedition: '2026-04-17',
     dateFacturation: '2026-04-18',
     lignes: [
@@ -45,6 +51,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.EXPEDIEE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-001',
+    adresseFacturation: 'La Table d\'Or — Siège\n24 rue du Faubourg Saint-Honoré\n75008 Paris\nFrance',
+    francoDePort: true,
+    fraisDePortHT: 0,
     dateExpedition: '2026-05-22',
     lignes: [
       { idLigne: 'L-003-1', numCommande: 'CMD-2026-003', reference: 'FG-001', quantiteCommandee: 5, quantiteExpediee: 5, remiseAppliquee: 0.25, prixUnitaireHT: 89.90 },
@@ -61,6 +70,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.PAYEE_VALIDEE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-003',
+    adresseFacturation: 'La Table d\'Or — Siège\n24 rue du Faubourg Saint-Honoré\n75008 Paris\nFrance',
+    francoDePort: true,
+    fraisDePortHT: 0,
     lignes: [
       { idLigne: 'L-004-1', numCommande: 'CMD-2026-004', reference: 'FG-002', quantiteCommandee: 12, quantiteExpediee: null, remiseAppliquee: 0.15, prixUnitaireHT: 45.50 },
       { idLigne: 'L-004-2', numCommande: 'CMD-2026-004', reference: 'CH-004', quantiteCommandee: 20, quantiteExpediee: null, remiseAppliquee: 0.15, prixUnitaireHT: 15.90 },
@@ -77,6 +89,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.FACTUREE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-004',
+    adresseFacturation: 'Le Bistrot du Marché\n42 rue Mercière\n69002 Lyon\nFrance',
+    francoDePort: false,
+    fraisDePortHT: 25,
     dateExpedition: '2026-04-04',
     dateFacturation: '2026-04-05',
     lignes: [
@@ -93,6 +108,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.EN_PREPARATION,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-004',
+    adresseFacturation: 'Le Bistrot du Marché\n42 rue Mercière\n69002 Lyon\nFrance',
+    francoDePort: false,
+    fraisDePortHT: 25,
     lignes: [
       { idLigne: 'L-006-1', numCommande: 'CMD-2026-006', reference: 'FG-004', quantiteCommandee: 6, quantiteExpediee: null, remiseAppliquee: 0, prixUnitaireHT: 38.00 },
       { idLigne: 'L-006-2', numCommande: 'CMD-2026-006', reference: 'VN-003', quantiteCommandee: 12, quantiteExpediee: null, remiseAppliquee: 0, prixUnitaireHT: 14.90 },
@@ -108,6 +126,9 @@ export const initialCommandes: Commande[] = [
     statut: StatutCommande.PAYEE_VALIDEE,
     devise: Devise.EUR,
     adresseLivraisonId: 'ADR-004',
+    adresseFacturation: 'Le Bistrot du Marché\n42 rue Mercière\n69002 Lyon\nFrance',
+    francoDePort: false,
+    fraisDePortHT: 25,
     lignes: [
       { idLigne: 'L-007-1', numCommande: 'CMD-2026-007', reference: 'PC-002', quantiteCommandee: 4, quantiteExpediee: null, remiseAppliquee: 0, prixUnitaireHT: 19.90 },
       { idLigne: 'L-007-2', numCommande: 'CMD-2026-007', reference: 'CH-003', quantiteCommandee: 3, quantiteExpediee: null, remiseAppliquee: 0, prixUnitaireHT: 32.90 },

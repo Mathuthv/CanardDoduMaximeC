@@ -139,6 +139,8 @@ export interface LigneCommande {
   quantiteExpediee: number | null  // null until logistics fills it
   remiseAppliquee: number          // e.g. 0.15 for 15%
   prixUnitaireHT: number           // Snapshot of price at order time
+  dateLivraison?: string           // DS-06: date livraison spécifique à cette ligne
+  adresseLivraison?: string        // DS-06: adresse livraison spécifique à cette ligne
 }
 
 export interface Commande {
@@ -151,6 +153,9 @@ export interface Commande {
   devise: Devise
   lignes: LigneCommande[]
   adresseLivraisonId: string
+  adresseFacturation: string        // DS-04: adresse facturation figée à la validation
+  francoDePort: boolean              // DS-12: true si seuil franco atteint
+  fraisDePortHT: number              // DS-12: montant frais port HT (0 si franco)
   notes?: string
   dateLivraisonSouhaitee?: string  // ISO date, chosen by client at checkout
   dateExpedition?: string     // ISO date, set when EXPEDIEE

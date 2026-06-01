@@ -15,6 +15,7 @@ import { OrderConfirmationPage } from './pages/fo/OrderConfirmationPage'
 import { OrderHistoryPage } from './pages/fo/OrderHistoryPage'
 import { OrderDetailPage } from './pages/fo/OrderDetailPage'
 import { DisputePage } from './pages/fo/DisputePage'
+import { DeliverySetupPage } from './pages/fo/DeliverySetupPage'
 
 // Back-Office pages
 import { BOLoginPage } from './pages/bo/BOLoginPage'
@@ -62,6 +63,7 @@ function App() {
         {/* Front-Office: Authenticated pages */}
         <Route element={<AuthGuard><FrontOfficeLayout /></AuthGuard>}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/commande/preparation" element={<DeliverySetupPage />} />
           <Route path="/catalogue" element={<CatalogPage />} />
           <Route path="/catalogue/:ref" element={<ProductDetailPage />} />
           <Route path="/panier" element={<CartPage />} />

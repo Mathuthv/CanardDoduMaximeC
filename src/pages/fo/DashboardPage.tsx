@@ -132,6 +132,17 @@ export function DashboardPage() {
         <Card padding="md">
           <h2 className="text-lg font-serif font-semibold text-gray-900 mb-4">Acces rapide</h2>
           <div className="space-y-3">
+            <Link to="/commande/preparation" className="flex items-center gap-4 p-4 rounded-lg border-2 border-bordeaux-200 bg-bordeaux-50/30 hover:bg-bordeaux-50 transition-colors">
+              <div className="p-3 rounded-lg bg-bordeaux-700">
+                <ShoppingBag className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-medium text-bordeaux-900">Passer une nouvelle commande</p>
+                <p className="text-sm text-bordeaux-600">Selectionnez vos adresses puis parcourez le catalogue</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-bordeaux-400 ml-auto" />
+            </Link>
+
             <Link to="/catalogue" className="flex items-center gap-4 p-4 rounded-lg border border-gray-100 hover:border-bordeaux-200 hover:bg-bordeaux-50/50 transition-colors">
               <div className="p-3 rounded-lg bg-bordeaux-50">
                 <BookOpen className="w-5 h-5 text-bordeaux-700" />

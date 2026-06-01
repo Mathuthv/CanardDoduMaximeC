@@ -8,7 +8,7 @@ interface OrderState {
   getByNum: (num: string) => Commande | undefined
   getByClient: (idClient: string) => Commande[]
   getByStatut: (statut: StatutCommande) => Commande[]
-  createFromCart: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[], dateLivraisonSouhaitee?: string) => Commande
+  createFromCart: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[], dateLivraisonSouhaitee?: string, adresseFacturation?: string, francoDePort?: boolean, fraisDePortHT?: number) => Commande
   setEnAttentePaiement: (numCommande: string) => void
   revertToCart: (numCommande: string) => void
   createFromPhone: (idClient: string, login: string, idCommercial: string, adresseLivraisonId: string, lignes: LigneCommande[], notes?: string) => Commande
@@ -26,7 +26,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
   getByStatut: (statut) => get().commandes.filter(c => c.statut === statut),
 
-  createFromCart: (idClient, login, idCommercial, adresseLivraisonId, lignes, dateLivraisonSouhaitee) => {
+  createFromCart: (idClient, login, idCommercial, adresseLivraisonId, lignes, dateLivraisonSouhaitee, adresseFacturation, francoDePort, fraisDePortHT) => {
     const numCommande = `CMD-2026-${String(get().commandes.length + 1).padStart(3, '0')}`
     const commande: Commande = {
       numCommande,
@@ -38,6 +38,9 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       devise: Devise.EUR,
       lignes,
       adresseLivraisonId,
+      adresseFacturation: adresseFacturation || '',
+      francoDePort: francoDePort ?? false,
+      fraisDePortHT: fraisDePortHT ?? 0,
       dateLivraisonSouhaitee,
     }
     set(state => ({ commandes: [...state.commandes, commande] }))
@@ -70,6 +73,9 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       devise: Devise.EUR,
       lignes,
       adresseLivraisonId,
+      adresseFacturation: '',
+      francoDePort: false,
+      fraisDePortHT: 0,
       notes,
     }
     set(state => ({ commandes: [...state.commandes, commande] }))

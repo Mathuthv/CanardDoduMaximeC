@@ -4,18 +4,34 @@ import { useProductStore } from './productStore'
 import { useConfigStore } from './configStore'
 import { calcCartTotals, canAddToCart } from '../utils/calculations'
 
+// F-02 delivery info, set BEFORE catalogue browsing (SFD flow)
+interface DeliveryInfo {
+  deliveryAddressId: string
+  deliveryDate: string
+  billingAddress: string       // adresse facturation (pré-remplie, lecture)
+  buyerAddress: string         // adresse acheteur (lecture seule)
+  multiLivraison: boolean
+  lineDeliveries: Record<string, { addressId: string; date: string }>  // per-line overrides (DS-06)
+}
+
 interface CartState {
   lignes: LignePanier[]
+  delivery: DeliveryInfo | null
+  deliveryReady: boolean
   addLine: (reference: string, quantite: number) => { success: boolean; message?: string }
   updateQty: (reference: string, quantite: number) => { success: boolean; message?: string }
   removeLine: (reference: string) => void
   clearCart: () => void
   getCartTotals: (idClient: string) => CartTotals
   getLineCount: () => number
+  setDelivery: (info: DeliveryInfo) => void
+  clearDelivery: () => void
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
   lignes: [],
+  delivery: null,
+  deliveryReady: false,
 
   addLine: (reference, quantite) => {
     const product = useProductStore.getState().getByRef(reference)
@@ -67,7 +83,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     set(state => ({ lignes: state.lignes.filter(l => l.reference !== reference) }))
   },
 
-  clearCart: () => set({ lignes: [] }),
+  clearCart: () => set({ lignes: [], delivery: null, deliveryReady: false }),
 
   getCartTotals: (idClient) => {
     const { products } = useProductStore.getState()
@@ -77,4 +93,8 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   getLineCount: () => get().lignes.reduce((sum, l) => sum + l.quantiteSouhaitee, 0),
+
+  setDelivery: (info) => set({ delivery: info, deliveryReady: true }),
+
+  clearDelivery: () => set({ delivery: null, deliveryReady: false }),
 }))
